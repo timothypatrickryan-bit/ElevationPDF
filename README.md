@@ -44,6 +44,10 @@ npm run dev -w apps/web
 ```
 
 Open the printed URL, choose a PDF, toggle layers (OCGs), navigate pages.
+To measure: dump sheet models with `feasibility.py <folder> --json-dir models/`,
+then "Open sheet model" with the matching page's JSON — the viewer builds a
+flatbush index over the extracted geometry and gives you a length tool with
+endpoint/intersection/midpoint snapping, scale evidence, and ft-in readouts.
 
 ## Sheet model
 

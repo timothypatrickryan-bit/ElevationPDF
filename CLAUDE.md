@@ -8,9 +8,10 @@ Read `docs/PLAN.md` first; §6, §7, §13 are normative for the code here.
   `feasibility.py` CLI, pytest golden suite driven by synthetic PDF fixtures
   (`tests/make_fixtures.py`).
 - `packages/model` — sheet-model JSON Schema (source of truth) + TS types.
-  Change the schema and the Python model together; `test_schema.py` validates
-  extractor output against the schema.
-- `apps/web` — Vite + React + pdf.js viewer.
+  Change the schema and the Python model together; the schema-validation test
+  in `tests/test_extract.py` checks extractor output against it.
+- `apps/web` — Vite + React + pdf.js viewer with snapping + length measurement
+  against a sheet-model JSON (produced by `feasibility.py --json-dir`).
 
 ## Commands
 

@@ -60,6 +60,11 @@ body {
   display: none;
 }
 
+.file-btn.secondary {
+  background: #fff;
+  color: #2456c8;
+}
+
 .file-name {
   color: #5a6068;
   max-width: 320px;
@@ -141,6 +146,111 @@ body {
   inset: 0;
   background: transparent;
   pointer-events: none;
+}
+
+.canvas-stack .overlay.active {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.scale-list,
+.measure-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.scale-list > li {
+  padding: 6px 4px;
+  border-radius: 4px;
+}
+
+.scale-list > li.active {
+  background: #eef3ff;
+}
+
+.scale-list label {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  cursor: pointer;
+}
+
+.scale-method {
+  font-weight: 600;
+}
+
+.scale-ppf {
+  color: #1844a0;
+  font-variant-numeric: tabular-nums;
+}
+
+.scale-conf {
+  margin-left: auto;
+  color: #8a9097;
+}
+
+.evidence {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0 0 0 22px;
+  color: #8a9097;
+  font-size: 12px;
+}
+
+.measure-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.measure-list li.total {
+  border-top: 1px solid #d8dce0;
+  margin-top: 4px;
+  padding-top: 6px;
+  font-weight: 600;
+}
+
+.measure-list .delete {
+  border: none;
+  background: none;
+  color: #8a9097;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.measure-list .delete:hover {
+  color: #a33;
+}
+
+.model-name {
+  font-size: 12px;
+  margin: -4px 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusbar {
+  padding: 4px 12px;
+  background: #fff;
+  border-top: 1px solid #d8dce0;
+  color: #5a6068;
+  font-size: 12px;
+  min-height: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.notice {
+  max-width: 640px;
+  margin: 8px auto;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fff8e6;
+  border: 1px solid #e0c66a;
+  color: #7a5d00;
 }
 
 .placeholder,
