@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# Feasibility outputs / local samples
+report.csv
+report*.csv
+*.sheetmodel.json
+sample-sets/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
