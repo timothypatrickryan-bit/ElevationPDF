@@ -1,0 +1,160 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1a1d21;
+  background: #eef0f2;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid #d8dce0;
+}
+
+.brand {
+  margin-right: 8px;
+}
+
+.toolbar button {
+  border: 1px solid #c6ccd2;
+  background: #fff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.toolbar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.file-btn {
+  border: 1px solid #2456c8;
+  background: #2f6bea;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.file-btn input {
+  display: none;
+}
+
+.file-name {
+  color: #5a6068;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.page-indicator,
+.zoom-indicator {
+  min-width: 56px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sidebar {
+  width: 240px;
+  padding: 12px;
+  background: #fff;
+  border-right: 1px solid #d8dce0;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5a6068;
+}
+
+.layer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.layer-list label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+
+.muted {
+  color: #8a9097;
+}
+
+.viewer {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+}
+
+.canvas-stack {
+  position: relative;
+  width: fit-content;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.canvas-stack canvas {
+  display: block;
+  background: #fff;
+}
+
+.canvas-stack .overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.placeholder,
+.error {
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 16px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #d8dce0;
+  color: #5a6068;
+}
+
+.error {
+  border-color: #d66;
+  color: #a33;
+}
