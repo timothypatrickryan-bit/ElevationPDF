@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://elevationpdf.dev/schema/sheet-model-0.1.json",
+  "title": "SheetModel",
+  "description": "Extraction output for one PDF page (PLAN.md §6). COORDINATE CONVENTION (normative): all coordinates are in 'sheet space' — the page as displayed (CropBox with /Rotate applied), origin at the top-left corner, x to the right, y DOWN, units = PDF points (1/72 inch). 'rotation' and 'user_unit' are provenance only; consumers must never re-apply them.",
+  "type": "object",
+  "required": [
+    "sheet_id",
+    "page_index",
+    "size_pt",
+    "rotation",
+    "user_unit",
+    "extractor_version",
+    "content_hash",
+    "layers",
+    "paths",
+    "texts",
+    "viewports",
+    "dimensions",
+    "scales",
+    "stats"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sheet_id": { "type": "string", "minLength": 1 },
+    "page_index": { "type": "integer", "minimum": 0 },
+    "size_pt": {
+      "description": "Displayed page size [width, height] in points (rotation applied).",
+      "$ref": "#/$defs/vec2"
+    },
+    "rotation": { "type": "integer", "enum": [0, 90, 180, 270] },
+    "user_unit": {
+      "description": "PDF /UserUnit multiplier (1.0 = default). physical_inches = value_pt * user_unit / 72.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "extractor_version": { "type": "string", "minLength": 1 },
+    "content_hash": {
+      "description": "sha256 over the page's content streams, prefixed 'sha256:'. Used for dedupe and revision compare.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "producer": { "type": ["string", "null"] },
+    "creator": { "type": ["string", "null"] },
+    "title_block": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sheet_no": { "type": ["string", "null"] },
+            "title": { "type": ["string", "null"] },
+            "scale_text": { "type": ["string", "null"] },
+            "bbox": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/bbox" }] }
+          }
+        }
+      ]
+    },
+    "layers": { "type": "array", "items": { "$ref": "#/$defs/layer" } },
+    "paths": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+    "texts": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "viewports": { "type": "array", "items": { "$ref": "#/$defs/viewport" } },
+    "dimensions": { "type": "array", "items": { "$ref": "#/$defs/dimension" } },
+    "scales": { "type": "array", "items": { "$ref": "#/$defs/scale" } },
+    "stats": { "$ref": "#/$defs/stats" }
+  },
+  "$defs": {
+    "vec2": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "bbox": {
+      "description": "[x0, y0, x1, y1] in sheet space, x0<=x1, y0<=y1.",
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "color": {
+      "description": "#RRGGBB lowercase hex.",
+      "type": "string",
+      "pattern": "^#[0-9a-f]{6}$"
+    },
+    "layer": {
+      "type": "object",
+      "required": ["id", "name", "source", "default_visible"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "source": { "type": "string", "enum": ["ocg", "inferred", "user"] },
+        "default_visible": { "type": "boolean" },
+        "signature": {
+          "description": "Representative style for inferred layers; null for OCG layers.",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "stroke": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/color" }] },
+                "width": { "type": ["number", "null"] },
+                "dash": { "type": "array", "items": { "type": "number" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "path": {
+      "type": "object",
+      "required": ["id", "layer_id", "kind", "pts", "stroke", "fill", "width", "dash", "closed"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "layer_id": { "type": ["string", "null"] },
+        "kind": {
+          "description": "line: 2 pts. polyline: n>=2 pts. rect/quad: 4 corner pts, closed. bezier: cubic chain control points, 3k+1 pts (p0 c1 c2 p1 c1' c2' p2 ...).",
+          "type": "string",
+          "enum": ["line", "polyline", "rect", "quad", "bezier"]
+        },
+        "pts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/vec2" },
+          "minItems": 2
+        },
+        "stroke": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/color" }] },
+        "fill": {
+          "description": "Fill color when the path is filled (hatches, solids). Kept distinct from stroke — clustering and area tools care.",
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/color" }]
+        },
+        "width": { "type": ["number", "null"] },
+        "dash": {
+          "description": "Dash array in points (empty = solid). Phase is dropped; normalize to ratios before clustering.",
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "closed": { "type": "boolean" }
+      }
+    },
+    "text": {
+      "type": "object",
+      "required": ["id", "str", "bbox", "dir", "rotation_deg", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "str": { "type": "string" },
+        "bbox": { "$ref": "#/$defs/bbox" },
+        "dir": {
+          "description": "Unit reading-direction vector in sheet space (y down). (1,0) = horizontal.",
+          "$ref": "#/$defs/vec2"
+        },
+        "rotation_deg": {
+          "description": "Reading direction in degrees CCW from horizontal, 0-359. Vertical (bottom-to-top) text = 90.",
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 360
+        },
+        "font": { "type": ["string", "null"] },
+        "size": { "type": ["number", "null"] },
+        "layer_id": { "type": ["string", "null"] },
+        "source": { "type": "string", "enum": ["text", "shx_comment", "ocr"] }
+      }
+    },
+    "viewport": {
+      "type": "object",
+      "required": ["id", "clip_bbox", "scale_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "clip_bbox": { "$ref": "#/$defs/bbox" },
+        "scale_ref": { "type": ["string", "null"] }
+      }
+    },
+    "dimension": {
+      "description": "A dimension-text candidate, optionally paired with a measured path.",
+      "type": "object",
+      "required": ["text_id", "value_ft"],
+      "additionalProperties": false,
+      "properties": {
+        "text_id": { "type": "string" },
+        "value_ft": { "type": "number", "exclusiveMinimum": 0 },
+        "path_id": { "type": ["string", "null"] },
+        "measured_pt": { "type": ["number", "null"] },
+        "implied_ppf": { "type": ["number", "null"] }
+      }
+    },
+    "scale": {
+      "type": "object",
+      "required": ["id", "method", "points_per_foot", "confidence", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "method": {
+          "type": "string",
+          "enum": ["measure_dict", "title_block", "dimension_fit", "manual", "none"]
+        },
+        "points_per_foot": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "evidence": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": [
+        "path_count",
+        "segment_count",
+        "text_char_count",
+        "image_coverage",
+        "is_raster",
+        "distinct_stroke_colors",
+        "monochrome"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path_count": { "type": "integer", "minimum": 0 },
+        "segment_count": { "type": "integer", "minimum": 0 },
+        "text_char_count": { "type": "integer", "minimum": 0 },
+        "image_coverage": {
+          "description": "Fraction of page area covered by images, clamped to [0,1].",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "is_raster": { "type": "boolean" },
+        "distinct_stroke_colors": { "type": "integer", "minimum": 0 },
+        "monochrome": {
+          "description": "True when >=95% of stroked paths are black/gray.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
